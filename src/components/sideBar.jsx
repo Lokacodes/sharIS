@@ -134,7 +134,7 @@ export default function MiniDrawer({ children }) {
         <Divider />
         <List>
           {['Beranda', 'Master Data', 'Transaksi', 'Laporan'].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'block' }} onClick={()=> {navigate(index == 0 ? "/" : index == 1 ? "master" : index == 2 ? "transaksi" : index == 3 ? "laporan" : "/")}}>
+            <ListItem key={text} disablePadding sx={{ display: 'block' }} onClick={() => { navigate(index == 0 ? "/" : index == 1 ? "master" : index == 2 ? "transaksi" : index == 3 ? "laporan" : "/") }}>
               <ListItemButton
                 sx={{
                   minHeight: 48,
