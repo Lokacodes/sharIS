@@ -16,8 +16,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { DataArrayOutlined, DataObject, Home, HomeMiniRounded, Storage, SyncAlt, Timeline } from '@mui/icons-material';
+import { Home, Storage, SyncAlt, Timeline, Logout, Settings, SettingsAccessibility } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import { useAuth } from '../context/AuthContext';
+import { Outlet } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -47,7 +55,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -75,9 +82,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     flexShrink: 0,
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
-    backgroundColor: '#052831', // Change this to your desired color
+    backgroundColor: '#052831',
     '& .MuiDrawer-paper': {
-      backgroundColor: '#052831', // Change this to your desired color
+      backgroundColor: '#052831',
     },
     ...(open && {
       ...openedMixin(theme),
@@ -92,8 +99,10 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function MiniDrawer({ children }) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
+  const [logoutDialogOpen, setLogoutDialogOpen] = React.useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -101,6 +110,20 @@ export default function MiniDrawer({ children }) {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const handleLogoutClick = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    logout()
+    setLogoutDialogOpen(false);
+    navigate('/login');
+  };
+
+  const handleLogoutCancel = () => {
+    setLogoutDialogOpen(false);
   };
 
   return (
@@ -133,40 +156,123 @@ export default function MiniDrawer({ children }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Beranda', 'Master Data', 'Transaksi', 'Laporan'].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'block' }} onClick={() => { navigate(index == 0 ? "/" : index == 1 ? "master" : index == 2 ? "transaksi" : index == 3 ? "laporan" : "/") }}>
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
+          {['Beranda', 'Master Data', 'Transaksi', 'Laporan', 'Pengaturan'].map((text, index) => (
+            <React.Fragment key={text}>
+              <ListItem disablePadding sx={{ display: 'block' }} onClick={() => {
+                if (index === 0) navigate("/");
+                else if (index === 1) navigate("master");
+                else if (index === 3) navigate("master/laporan");
+                else if (index === 4) navigate("pengaturan");
+              }}>
+                <ListItemButton
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
                   }}
                 >
-                  {index === 0 && <Home />}
-                  {index === 1 && <Storage />}
-                  {index === 2 && <SyncAlt />}
-                  {index === 3 && <Timeline />}
-                </ListItemIcon>
-                <ListItemText primary={
-                  <Typography fontFamily={'montserrat'}>
-                    {text}
-                  </Typography>
-                } sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {index === 0 && <Home />}
+                    {index === 1 && <Storage />}
+                    {index === 2 && <SyncAlt />}
+                    {index === 3 && <Timeline />}
+                    {index === 4 && <Settings />}
+                  </ListItemIcon>
+                  <ListItemText primary={
+                    <Typography fontFamily={'montserrat'}>
+                      {text}
+                    </Typography>
+                  } sx={{ opacity: open ? 1 : 0 }} />
+                </ListItemButton>
+              </ListItem>
+              {index === 2 && open && (
+                <List component="div" disablePadding sx={{ pl: 4 }}>
+                  <ListItem disablePadding onClick={() => navigate("transaksi/simpanan")}>
+                    <ListItemButton sx={{ minHeight: 40 }}>
+                      <ListItemText primary={
+                        <Typography fontFamily={'montserrat'} fontSize={14}>
+                          Simpanan
+                        </Typography>
+                      } />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding onClick={() => navigate("transaksi/pinjaman")}>
+                    <ListItemButton sx={{ minHeight: 40 }}>
+                      <ListItemText primary={
+                        <Typography fontFamily={'montserrat'} fontSize={14}>
+                          Pinjaman
+                        </Typography>
+                      } />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding onClick={() => navigate("transaksi/angsuran")}>
+                    <ListItemButton sx={{ minHeight: 40 }}>
+                      <ListItemText primary={
+                        <Typography fontFamily={'montserrat'} fontSize={14}>
+                          Angsuran
+                        </Typography>
+                      } />
+                    </ListItemButton>
+                  </ListItem>
+                </List>
+              )}
+            </React.Fragment>
           ))}
         </List>
+        <Box sx={{ flexGrow: 1 }} />
+        <List sx={{ position: 'absolute', bottom: 0, width: '100%' }}>
+          <Divider />
+          <ListItem disablePadding sx={{ display: 'block' }} onClick={handleLogoutClick}>
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? 'initial' : 'center',
+                px: 2.5,
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 3 : 'auto',
+                  justifyContent: 'center',
+                }}
+              >
+                <Logout />
+              </ListItemIcon>
+              <ListItemText primary={
+                <Typography fontFamily={'montserrat'}>
+                  Logout
+                </Typography>
+              } sx={{ opacity: open ? 1 : 0 }} />
+            </ListItemButton>
+          </ListItem>
+        </List>
+        <Dialog
+          open={logoutDialogOpen}
+          onClose={handleLogoutCancel}
+        >
+          <DialogTitle>Konfirmasi Logout</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Apakah Anda yakin ingin logout?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleLogoutCancel}>Batal</Button>
+            <Button onClick={handleLogoutConfirm} color="error">Logout</Button>
+          </DialogActions>
+        </Dialog>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         {children}
+        <Outlet />
       </Box>
     </Box>
   );

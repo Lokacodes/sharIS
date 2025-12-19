@@ -4,10 +4,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useState } from 'react'
-import * as React from 'react';
 import { DateField, DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import dayjs from "dayjs";
 
 export default function Transaksi() {
     const [jnsTransaksi, setJnsTransaksi] = useState("");
@@ -201,8 +199,8 @@ export default function Transaksi() {
                                         <TextField
                                             id="outlined-required"
                                             label="Nominal Angsuran"
-                                            value={jumlahPinjam/lamaPinjam}
-                                            onChange={()=>{}}
+                                            value={jumlahPinjam / lamaPinjam}
+                                            onChange={() => { }}
                                             fullWidth
                                         />
                                     </Grid>
