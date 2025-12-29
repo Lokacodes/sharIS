@@ -14,6 +14,7 @@ export default function CashbookList() {
                             { key: "type", label: "Tipe" },
                             { key: "module", label: "Modul" },
                             { key: "member.name", label: "Anggota" },
+                            { key: "user.name", label: "Pegawai" },
                             { key: "amount", label: "Jumlah" },
                             { key: "balance", label: "Saldo" },
                             { key: "description", label: "Keterangan" },

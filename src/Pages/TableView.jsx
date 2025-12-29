@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import api from '../api/api';
+import { handleApiError } from "../utils/handleApiError";
 import {
   TableContainer,
   Paper,
@@ -48,14 +49,16 @@ function DataTable({
 
   useEffect(() => {
     if (!endpoint) return;
-
     const token = localStorage.getItem('token');
     api
       .get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then(res => setRows(res.data.data || []))
-      .catch(() => setRows([]));
+      .then((res) => setRows(res.data.data || []))
+      .catch((err) => {
+        setRows([])
+        handleApiError(err, null, { logout, login });
+      });
   }, [endpoint, login, logout]);
 
   const inferredColumns =
@@ -64,15 +67,12 @@ function DataTable({
       ? Object.keys(rows[0]).map((key) => ({ key, label: key }))
       : []);
 
-  // 🔍 Filter rows
   const filteredRows = useMemo(() => {
     if (!search) return rows;
     const lower = search.toLowerCase();
-
     return rows.filter((row) =>
       inferredColumns.some((col) => {
         let val;
-
         if (typeof col.valueGetter === 'function') {
           val = col.valueGetter(row);
         } else if (col.key.includes('.')) {
@@ -80,22 +80,18 @@ function DataTable({
         } else {
           val = row[col.key];
         }
-
         if (val == null) return false;
         return String(val).toLowerCase().includes(lower);
       })
     );
   }, [search, rows, inferredColumns]);
 
-
-  // 📄 Apply pagination (client-side)
   const paginatedRows = useMemo(() => {
     if (!paginated) return filteredRows;
     const start = page * rowsPerPage;
     return filteredRows.slice(start, start + rowsPerPage);
   }, [filteredRows, page, rowsPerPage, paginated]);
 
-  // Pagination handlers
   const handleChangePage = (_, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (e) => {
     setRowsPerPage(parseInt(e.target.value, 10));
@@ -106,7 +102,11 @@ function DataTable({
     <Box>
       {searchable && (
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6" sx={{ alignSelf: 'center' }} fontFamily={'montserrat'}>
+          <Typography
+            variant="h6"
+            sx={{ alignSelf: 'center' }}
+            fontFamily="montserrat"
+          >
             {title}
           </Typography>
           <TextField
@@ -119,7 +119,6 @@ function DataTable({
           />
         </Box>
       )}
-
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label={`${endpoint} table`}>
           <TableHead>
@@ -135,16 +134,16 @@ function DataTable({
               <TableRow key={row.id || row._id}>
                 {inferredColumns.map((col) => {
                   let value;
-
                   if (typeof col.valueGetter === 'function') {
                     value = col.valueGetter(row);
                   } else if (col.key.includes('.')) {
-                    value = col.key.split('.').reduce((obj, key) => obj?.[key], row);
+                    value = col.key
+                      .split('.')
+                      .reduce((obj, key) => obj?.[key], row);
                   } else {
                     value = row[col.key];
                   }
 
-                  // Auto-format date-like fields (keys containing "date" or "deadline")
                   if (
                     typeof col.key === 'string' &&
                     /(date|deadline)/i.test(col.key) &&
@@ -153,11 +152,13 @@ function DataTable({
                     value = formatDate(value);
                   }
 
-                  const formatted = formatCell ? formatCell(col.key, value) : value;
-
-                  return <TableCell key={col.key}>{formatted}</TableCell>;
+                  const formatted = formatCell
+                    ? formatCell(col.key, value)
+                    : value;
+                  return (
+                    <TableCell key={col.key}>{formatted}</TableCell>
+                  );
                 })}
-
                 {showDetail && (
                   <TableCell>
                     <Button
@@ -176,7 +177,9 @@ function DataTable({
             {paginatedRows.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={inferredColumns.length + (showDetail ? 1 : 0)}
+                  colSpan={
+                    inferredColumns.length + (showDetail ? 1 : 0)
+                  }
                   align="center"
                 >
                   Tidak ada data ditemukan.
@@ -185,8 +188,6 @@ function DataTable({
             )}
           </TableBody>
         </Table>
-
-        {/* 📄 Pagination Controls */}
         {paginated && (
           <TablePagination
             component="div"

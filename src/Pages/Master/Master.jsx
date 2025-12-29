@@ -3,16 +3,23 @@ import { Grid, Paper, IconButton } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import { Assessment, CreditCard, AccountBalanceOutlined, AttachMoneyOutlined, AssessmentOutlined } from '@mui/icons-material';
+import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 
 export default function Master() {
     const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const allow = (roles) => user && roles.includes(user.role);
+
+    if (!user) return null;
     return (
         <>
             <Typography variant="h4" fontWeight={500} fontFamily={'montserrat'} color="initial">Master</Typography>
             <Grid container spacing={2}>
-                <Grid item>
+                {allow(['SUPERADMIN', 'SEKRETARIS']) && <Grid item>
                     <IconButton aria-label="" onClick={() => navigate('/master/member')}>
                         <Paper elevation={3} sx={{ borderRadius: 5 }}>
                             <Grid container spacing={1} direction={"column"} textAlign={"center"} p={4} width={"150px"}>
@@ -25,8 +32,8 @@ export default function Master() {
                             </Grid>
                         </Paper>
                     </IconButton>
-                </Grid>
-                <Grid item>
+                </Grid>}
+                {allow(['SUPERADMIN', 'BENDAHARA']) && <Grid item>
                     <IconButton aria-label="" onClick={() => navigate('/master/simpanan')}>
                         <Paper elevation={3} sx={{ borderRadius: 5 }}>
                             <Grid container spacing={1} direction={"column"} textAlign={"center"} p={4} width={"150px"}>
@@ -40,8 +47,8 @@ export default function Master() {
                         </Paper>
                     </IconButton>
 
-                </Grid>
-                <Grid item>
+                </Grid>}
+                {allow(['SUPERADMIN', 'BENDAHARA']) && <Grid item>
                     <IconButton aria-label="" onClick={() => navigate('/master/pinjaman')}>
                         <Paper elevation={3} sx={{ borderRadius: 5 }}>
                             <Grid container spacing={1} direction={"column"} textAlign={"center"} p={4} width={"150px"}>
@@ -55,9 +62,9 @@ export default function Master() {
                         </Paper>
                     </IconButton>
 
-                </Grid>
+                </Grid>}
 
-                <Grid item>
+                {allow(['SUPERADMIN', 'BENDAHARA']) && <Grid item>
                     <IconButton aria-label="" onClick={() => navigate('/master/modal')}>
                         <Paper elevation={3} sx={{ borderRadius: 5 }}>
                             <Grid container spacing={1} direction={"column"} textAlign={"center"} p={4} width={"150px"}>
@@ -70,9 +77,9 @@ export default function Master() {
                             </Grid>
                         </Paper>
                     </IconButton>
-                </Grid>
+                </Grid>}
 
-                <Grid item>
+                {allow(['SUPERADMIN', 'BENDAHARA']) && <Grid item>
                     <IconButton aria-label="" onClick={() => navigate('/master/kas')}>
                         <Paper elevation={3} sx={{ borderRadius: 5 }}>
                             <Grid container spacing={1} direction={"column"} textAlign={"center"} p={4} width={"150px"}>
@@ -85,22 +92,22 @@ export default function Master() {
                             </Grid>
                         </Paper>
                     </IconButton>
-                </Grid>
+                </Grid>}
 
-                <Grid item>
+                {allow(['SUPERADMIN', 'BENDAHARA']) && <Grid item>
                     <IconButton aria-label="" onClick={() => navigate('/master/pengeluaran')}>
                         <Paper elevation={3} sx={{ borderRadius: 5 }}>
                             <Grid container spacing={1} direction={"column"} textAlign={"center"} p={4} width={"150px"}>
                                 <Grid item>
-
+                                    <ProductionQuantityLimitsIcon fontSize='large'></ProductionQuantityLimitsIcon>
                                 </Grid>
                                 <Grid item>
-                                    <Typography variant="body1" color="initial">Kas</Typography>
+                                    <Typography variant="body1" color="initial">Pengeluaran</Typography>
                                 </Grid>
                             </Grid>
                         </Paper>
                     </IconButton>
-                </Grid>
+                </Grid>}
             </Grid>
         </>
     );

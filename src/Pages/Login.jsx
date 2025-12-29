@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, Button, TextField, Typography, Paper, CircularProgress } from "@mui/material";
+import {
+    Box,
+    Button,
+    TextField,
+    Typography,
+    Paper,
+    CircularProgress,
+} from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -8,11 +15,14 @@ const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (loading) return;
+
         setLoading(true);
 
         try {
@@ -21,9 +31,12 @@ const LoginPage = () => {
                 password,
             });
 
-            login(res.data.data.user, res.data.data.accessToken, res.data.data.refreshToken);
-            console.log(`refresh ${res.data.data.refreshToken}`);
-            console.log(`access ${res.data.data.accessToken}`);
+            login(
+                res.data.data.user,
+                res.data.data.accessToken,
+                res.data.data.refreshToken
+            );
+
             navigate("/");
         } catch (err) {
             alert(err.response?.data?.message || "Login gagal");
@@ -63,22 +76,22 @@ const LoginPage = () => {
                 <form onSubmit={handleSubmit}>
                     <TextField
                         label="Email"
-                        variant="outlined"
                         fullWidth
                         margin="normal"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        disabled={loading}
                     />
                     <TextField
                         label="Password"
                         type="password"
-                        variant="outlined"
                         fullWidth
                         margin="normal"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        disabled={loading}
                     />
 
                     <Button
@@ -88,12 +101,18 @@ const LoginPage = () => {
                         sx={{
                             mt: 3,
                             backgroundColor: "#052831",
-                            "&:hover": { backgroundColor: "#073b47" },
+                            "&:hover": {
+                                backgroundColor: "#073b47",
+                            },
                             height: 45,
                         }}
                         disabled={loading}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+                        {loading ? (
+                            <CircularProgress size={24} color="inherit" />
+                        ) : (
+                            "Login"
+                        )}
                     </Button>
                 </form>
             </Paper>

@@ -17,9 +17,8 @@ export default function SHUConfigCreate() {
     const { login, logout } = useAuth();
 
     const [tahun, setTahun] = useState(new Date().getFullYear());
-    const [items, setItems] = useState([
-        { key: "", percent: "" },
-    ]);
+    const [items, setItems] = useState([{ key: "", percent: "" }]);
+    const [loading, setLoading] = useState(false);
 
     const totalPercent = useMemo(
         () =>
@@ -47,7 +46,9 @@ export default function SHUConfigCreate() {
     };
 
     const handleSubmit = async () => {
-        if (!isValidTotal) return;
+        if (!isValidTotal || loading) return;
+
+        setLoading(true);
 
         try {
             await api.post(
@@ -118,16 +119,11 @@ export default function SHUConfigCreate() {
                             />
                         </Grid>
 
-                        <Grid
-                            item
-                            xs={2}
-                            display="flex"
-                            alignItems="center"
-                        >
+                        <Grid item xs={2} display="flex" alignItems="center">
                             <Button
                                 color="error"
                                 onClick={() => removeItem(index)}
-                                disabled={items.length === 1}
+                                disabled={items.length === 1 || loading}
                             >
                                 Hapus
                             </Button>
@@ -135,7 +131,7 @@ export default function SHUConfigCreate() {
                     </Grid>
                 ))}
 
-                <Button onClick={addItem} sx={{ mt: 2 }}>
+                <Button onClick={addItem} sx={{ mt: 2 }} disabled={loading}>
                     + Tambah Pembagian
                 </Button>
 
@@ -149,7 +145,7 @@ export default function SHUConfigCreate() {
                 <Grid container justifyContent="flex-end" mt={3}>
                     <Button
                         variant="contained"
-                        disabled={!isValidTotal}
+                        disabled={!isValidTotal || loading}
                         onClick={handleSubmit}
                     >
                         Simpan

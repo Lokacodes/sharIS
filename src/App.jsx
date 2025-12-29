@@ -26,6 +26,9 @@ import CashbookList from './Pages/Master/Master.CashBook'
 import SHUPage from './Pages/Master/Master.Laporan'
 import MemberForm from './Pages/Master/MemberForm'
 import SHUConfigCreate from './Pages/Master/Laporan/SHUSettings/SHUConfigCreate'
+import Expense from './Pages/Master/Master.Expense'
+import CashBookWithFilter from './Pages/Master/Laporan/RincianCashbook'
+import PengajuanPinjamanList from './Pages/Transaksi/PengajuanPinjamanList'
 
 function App() {
 
@@ -70,6 +73,7 @@ function App() {
               <Route path="master/pinjaman" element={<PinjamanMaster />} />
               <Route path="master/rekap" element={<MockData />} />
               <Route path="transaksi/pinjaman" element={<PinjamanForm />} />
+              <Route path="transaksi/pengajuan-pinjaman" element={<PengajuanPinjamanList />} />
               <Route path="transaksi/simpanan" element={<SimpananForm />} />
               <Route path="transaksi/angsuran/:memberId?" element={<AngsuranForm />} />
               <Route path="detail/member/:id" element={<MemberDetail />} />
@@ -83,8 +87,8 @@ function App() {
               <Route path="master/shu-config" element={<SHUConfigList />} />
               <Route path="master/shu-config/:id" element={<SHUConfigDetail />} />
               <Route path="master/shu-config/create" element={<SHUConfigCreate />} />
-
-
+              <Route path="master/pengeluaran" element={<Expense />} />
+              <Route path="master/laporan/rincian/:module" element={<CashBookWithFilter />} />
             </Route>
           </Routes>
         </AuthProvider>

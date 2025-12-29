@@ -17,20 +17,21 @@ import { useNavigate } from "react-router-dom";
 import { handleApiError } from "../../utils/handleApiError";
 import api from "../../api/api";
 
-export default function ModalForm() {
+export default function Expense() {
     const [amount, setAmount] = useState("");
     const [date, setDate] = useState(dayjs());
-    const [description, setDescription] = useState("Modal awal koperasi");
+    const [description, setDescription] = useState("");
 
     const { user, login, logout } = useAuth();
     const navigate = useNavigate();
 
-    const isDataComplete = amount && date && description;
+    const isDataComplete =
+        amount && date && description;
 
     const resetForm = () => {
         setAmount("");
         setDate(dayjs());
-        setDescription("Modal awal koperasi");
+        setDescription("");
     };
 
     const handleSubmit = async (e) => {
@@ -40,10 +41,10 @@ export default function ModalForm() {
             await api.post(
                 "/cashbook",
                 {
-                    type: "IN",
-                    module: "MODAL",
+                    type: "OUT",
+                    module: "EXPENSE",
                     amount: amount.toString(),
-                    date: date?.format("YYYY-MM-DD"),
+                    date: date.format("YYYY-MM-DD"),
                     description,
                     user: user.userId,
                 },
@@ -54,7 +55,7 @@ export default function ModalForm() {
                 }
             );
 
-            alert("Modal berhasil dicatat");
+            alert("Pengeluaran berhasil dicatat");
             resetForm();
         } catch (e) {
             handleApiError(e, navigate, { logout, login });
@@ -63,16 +64,21 @@ export default function ModalForm() {
 
     return (
         <>
-            <Typography variant="h4" fontWeight={500} fontFamily="montserrat">
-                Input Modal Koperasi
+            <Typography
+                variant="h4"
+                fontWeight={500}
+                fontFamily="montserrat"
+            >
+                Input Pengeluaran
             </Typography>
 
             <Paper elevation={3} sx={{ borderRadius: 3, p: 4, mt: 2 }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <Grid container spacing={2}>
+                        {/* Jumlah */}
                         <Grid item xs={12}>
                             <TextField
-                                label="Jumlah Modal (Rp)"
+                                label="Jumlah Pengeluaran (Rp)"
                                 fullWidth
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
@@ -83,9 +89,10 @@ export default function ModalForm() {
                             />
                         </Grid>
 
+                        {/* Tanggal */}
                         <Grid item xs={12}>
                             <DatePicker
-                                label="Tanggal Modal"
+                                label="Tanggal Pengeluaran"
                                 value={date}
                                 onChange={(newValue) =>
                                     setDate(newValue || dayjs())
@@ -96,6 +103,7 @@ export default function ModalForm() {
                             />
                         </Grid>
 
+                        {/* Keterangan */}
                         <Grid item xs={12}>
                             <TextField
                                 label="Keterangan"
@@ -104,17 +112,19 @@ export default function ModalForm() {
                                 onChange={(e) =>
                                     setDescription(e.target.value)
                                 }
+                                placeholder="Contoh: Biaya listrik kantor"
                             />
                         </Grid>
 
+                        {/* Submit */}
                         <Grid item xs={12} textAlign="right">
                             <Button
                                 variant="contained"
-                                color="success"
+                                color="error"
                                 onClick={handleSubmit}
                                 disabled={!isDataComplete}
                             >
-                                Simpan Modal
+                                Simpan Pengeluaran
                             </Button>
                         </Grid>
                     </Grid>

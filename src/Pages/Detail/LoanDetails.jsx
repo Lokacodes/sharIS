@@ -11,15 +11,20 @@ const fontFamily = "montserrat";
 
 export default function LoanDetail() {
     const { id } = useParams();
-    const { login, logout } = useAuth();
+    const { login, logout, user } = useAuth();
     const [loan, setLoan] = useState(null);
     const [installment, setInstallment] = useState(null);
     const [member, setMember] = useState(null);
-    const [user, setUser] = useState(null);
+    const [userState, setUser] = useState(null);
 
     const [remainingLoan, setRemainingLoan] = useState(0)
 
     const navigate = useNavigate()
+
+    const allow = (roles) => user && roles.includes(user.role);
+
+    if (!user) return null;
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -100,7 +105,7 @@ export default function LoanDetail() {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell sx={{ fontFamily }}><b>Pengurus</b></TableCell>
-                                                <TableCell sx={{ fontFamily }}><span style={{ fontWeight: 500 }}>: {user.name}</span></TableCell>
+                                                <TableCell sx={{ fontFamily }}><span style={{ fontWeight: 500 }}>: {userState.name}</span></TableCell>
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell sx={{ fontFamily }}><b>Jumlah</b></TableCell>
@@ -124,7 +129,7 @@ export default function LoanDetail() {
                                                     <span style={{ color: "#1976d2", fontFamily, fontWeight: 500 }}>: {loan.status}</span>
                                                 </TableCell>
                                             </TableRow>
-                                            {loan.status === "DIAJUKAN" && (
+                                            {loan.status === "DIAJUKAN" && allow(['SUPERADMIN', 'KETUA']) && (
                                                 <TableRow>
                                                     <TableCell colSpan={2} sx={{ fontFamily }}>
                                                         <Grid container spacing={2}>
@@ -142,7 +147,7 @@ export default function LoanDetail() {
                                                     </TableCell>
                                                 </TableRow>
                                             )}
-                                            {loan.status === "DISETUJUI" && (
+                                            {loan.status === "DISETUJUI" && allow(['SUPERADMIN', 'BENDAHARA']) && (
                                                 <TableRow>
                                                     <TableCell colSpan={2} sx={{ fontFamily }}>
                                                         <Button

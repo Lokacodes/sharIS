@@ -1,8 +1,11 @@
 import { Paper, Grid, Typography, Divider } from "@mui/material";
 import formatCurrency from "../../../utils/currencyFormatter";
+import { useNavigate } from "react-router-dom";
 
 export default function LabaRugiSection({ data }) {
     if (!data) return null;
+
+    const navigate = new useNavigate()
 
     return (
         <Paper elevation={3} sx={{ borderRadius: 3, p: 4, mt: 3 }}>
@@ -28,7 +31,13 @@ export default function LabaRugiSection({ data }) {
                 <Grid item xs={6} textAlign="right">
                     <Typography>{formatCurrency(data.pendapatan)}</Typography>
                 </Grid>
-
+                <Grid item xs={6}>
+                </Grid>
+                <Grid item xs={6} textAlign="right">
+                    <button onClick={() => navigate("/master/laporan/rincian/INCOME")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#1976d2", textDecoration: "underline" }}>
+                        (Rincian Pendapatan)
+                    </button>
+                </Grid>
                 <Grid item xs={6}>
                     <Typography>Biaya</Typography>
                 </Grid>
@@ -36,6 +45,14 @@ export default function LabaRugiSection({ data }) {
                     <Typography color="error">
                         {formatCurrency(data.biaya)}
                     </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                </Grid>
+                <Grid item xs={6} textAlign="right">
+                    <button onClick={() => navigate("/master/laporan/rincian/EXPENSE")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#1976d2", textDecoration: "underline" }}>
+                        (Rincian Biaya)
+                    </button>
                 </Grid>
 
                 <Grid item xs={12}>

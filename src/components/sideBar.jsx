@@ -104,6 +104,21 @@ export default function MiniDrawer({ children }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+  const { user } = useAuth();
+
+  const allow = (roles) => user && roles.includes(user.role);
+
+  if (!user) return null;
+
+  const menus = [
+    { text: 'Beranda', icon: <Home />, path: '/', roles: ['SUPERADMIN', 'BENDAHARA', 'PENGURUS', 'KETUA', 'SEKRETARIS'] },
+    { text: 'Master Data', icon: <Storage />, path: 'master', roles: ['SUPERADMIN', 'BENDAHARA', 'SEKRETARIS'] },
+    { text: 'Transaksi', icon: <SyncAlt />, roles: ['SUPERADMIN', 'BENDAHARA', 'KETUA'] },
+    { text: 'Laporan', icon: <Timeline />, path: 'master/laporan', roles: ['SUPERADMIN', 'SEKRETARIS', 'KETUA'] },
+    { text: 'Pengaturan', icon: <Settings />, path: 'pengaturan', roles: ['SUPERADMIN'] },
+  ];
+
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -156,74 +171,80 @@ export default function MiniDrawer({ children }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Beranda', 'Master Data', 'Transaksi', 'Laporan', 'Pengaturan'].map((text, index) => (
-            <React.Fragment key={text}>
-              <ListItem disablePadding sx={{ display: 'block' }} onClick={() => {
-                if (index === 0) navigate("/");
-                else if (index === 1) navigate("master");
-                else if (index === 3) navigate("master/laporan");
-                else if (index === 4) navigate("pengaturan");
-              }}>
-                <ListItemButton
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2.5,
-                  }}
+          {menus
+            .filter(menu => allow(menu.roles))
+            .map((menu, index) => (
+              <React.Fragment key={menu.text}>
+                <ListItem
+                  disablePadding
+                  sx={{ display: 'block' }}
+                  onClick={() => menu.path && navigate(menu.path)}
                 >
-                  <ListItemIcon
+                  <ListItemButton
                     sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : 'auto',
-                      justifyContent: 'center',
+                      minHeight: 48,
+                      justifyContent: open ? 'initial' : 'center',
+                      px: 2.5,
                     }}
                   >
-                    {index === 0 && <Home />}
-                    {index === 1 && <Storage />}
-                    {index === 2 && <SyncAlt />}
-                    {index === 3 && <Timeline />}
-                    {index === 4 && <Settings />}
-                  </ListItemIcon>
-                  <ListItemText primary={
-                    <Typography fontFamily={'montserrat'}>
-                      {text}
-                    </Typography>
-                  } sx={{ opacity: open ? 1 : 0 }} />
-                </ListItemButton>
-              </ListItem>
-              {index === 2 && open && (
-                <List component="div" disablePadding sx={{ pl: 4 }}>
-                  <ListItem disablePadding onClick={() => navigate("transaksi/simpanan")}>
-                    <ListItemButton sx={{ minHeight: 40 }}>
-                      <ListItemText primary={
-                        <Typography fontFamily={'montserrat'} fontSize={14}>
-                          Simpanan
-                        </Typography>
-                      } />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem disablePadding onClick={() => navigate("transaksi/pinjaman")}>
-                    <ListItemButton sx={{ minHeight: 40 }}>
-                      <ListItemText primary={
-                        <Typography fontFamily={'montserrat'} fontSize={14}>
-                          Pinjaman
-                        </Typography>
-                      } />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem disablePadding onClick={() => navigate("transaksi/angsuran")}>
-                    <ListItemButton sx={{ minHeight: 40 }}>
-                      <ListItemText primary={
-                        <Typography fontFamily={'montserrat'} fontSize={14}>
-                          Angsuran
-                        </Typography>
-                      } />
-                    </ListItemButton>
-                  </ListItem>
-                </List>
-              )}
-            </React.Fragment>
-          ))}
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: open ? 3 : 'auto',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {menu.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography fontFamily="montserrat">{menu.text}</Typography>}
+                      sx={{ opacity: open ? 1 : 0 }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                {menu.text === 'Transaksi' && open && allow(['SUPERADMIN', 'BENDAHARA',]) && (
+                  <List component="div" disablePadding sx={{ pl: 4 }}>
+                    <ListItem disablePadding onClick={() => navigate("transaksi/simpanan")}>
+                      <ListItemButton sx={{ minHeight: 40 }}>
+                        <ListItemText primary={<Typography fontSize={14}>Simpanan</Typography>} />
+                      </ListItemButton>
+                    </ListItem>
+
+                    <ListItem disablePadding onClick={() => navigate("transaksi/pinjaman")}>
+                      <ListItemButton sx={{ minHeight: 40 }}>
+                        <ListItemText primary={<Typography fontSize={14}>Pinjaman</Typography>} />
+                      </ListItemButton>
+                    </ListItem>
+
+                    <ListItem disablePadding onClick={() => navigate("transaksi/angsuran")}>
+                      <ListItemButton sx={{ minHeight: 40 }}>
+                        <ListItemText primary={<Typography fontSize={14}>Angsuran</Typography>} />
+                      </ListItemButton>
+                    </ListItem>
+                  </List>
+                )}
+
+                {menu.text === 'Transaksi' && open && allow(['KETUA']) && (
+                  <List component="div" disablePadding sx={{ pl: 4 }}>
+                    <ListItem
+                      disablePadding
+                      onClick={() => navigate("transaksi/pengajuan-pinjaman")}
+                    >
+                      <ListItemButton sx={{ minHeight: 40 }}>
+                        <ListItemText
+                          primary={
+                            <Typography fontSize={14}>
+                              Pengajuan Pinjaman
+                            </Typography>
+                          }
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </List>
+                )}
+
+              </React.Fragment>
+            ))}
         </List>
         <Box sx={{ flexGrow: 1 }} />
         <List sx={{ position: 'absolute', bottom: 0, width: '100%' }}>

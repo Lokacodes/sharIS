@@ -11,41 +11,63 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../../api/api";
 import { handleApiError } from "../../../../utils/handleApiError";
 import { useAuth } from "../../../../context/AuthContext";
+import { useError } from "../../../../context/ErrorContext";
 
 export default function SHUConfigDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { logout, login } = useAuth();
+    const { showError } = useError();
 
     const [tahun, setTahun] = useState("");
-    const [config, setConfig] = useState();
+    const [config, setConfig] = useState(null);
     const [items, setItems] = useState([]);
-
-    const fetchDetail = async () => {
-        try {
-            const res = await api.get(`/shuConfig?tahun=${id}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            });
-
-            console.log("res", res)
-
-            setTahun(res.data.data[0].tahun);
-            setItems(
-                res.data.data[0].items.map((i) => ({
-                    key: i.key,
-                    percent: i.percent.toString(),
-                }))
-            );
-
-            setConfig(res.data.data[0])
-        } catch (err) {
-            handleApiError(err, null, { logout, login });
-        }
-    };
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        let isMounted = true;
+
+        const fetchDetail = async () => {
+            setLoading(true);
+
+            try {
+                const res = await api.get(`/shuConfig?tahun=${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+
+                if (!isMounted) return;
+
+                const data = res.data?.data?.[0];
+
+                if (!data) return;
+
+                setTahun(data.tahun);
+                setItems(
+                    data.items.map((i) => ({
+                        key: i.key,
+                        percent: i.percent.toString(),
+                    }))
+                );
+                setConfig(data);
+            } catch (err) {
+                const result = await handleApiError(err, { login, logout });
+
+                if (result && !result.silent) {
+                    showError(result.message, result.title);
+                }
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
         fetchDetail();
-    }, []);
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id, login, logout, showError]);
 
     const totalPercent = useMemo(
         () =>
@@ -73,7 +95,9 @@ export default function SHUConfigDetail() {
     };
 
     const handleSubmit = async () => {
-        if (!isValidTotal) return;
+        if (!isValidTotal || !config || loading) return;
+
+        setLoading(true);
 
         try {
             await api.patch(
@@ -86,14 +110,22 @@ export default function SHUConfigDetail() {
                     })),
                 },
                 {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
                 }
             );
 
-            alert("Berhasil update konfigurasi SHU");
+            // ✅ success flow
             navigate("/master/shu-config");
         } catch (err) {
-            handleApiError(err, null, { logout, login });
+            const result = await handleApiError(err, { login, logout });
+
+            if (result && !result.silent) {
+                showError(result.message, result.title);
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -111,6 +143,7 @@ export default function SHUConfigDetail() {
                     onChange={(e) => setTahun(Number(e.target.value))}
                     fullWidth
                     sx={{ mb: 3 }}
+                    disabled={loading}
                 />
 
                 <Divider sx={{ mb: 3 }} />
@@ -125,6 +158,7 @@ export default function SHUConfigDetail() {
                                     updateItem(index, "key", e.target.value)
                                 }
                                 fullWidth
+                                disabled={loading}
                             />
                         </Grid>
                         <Grid item xs={4}>
@@ -136,12 +170,14 @@ export default function SHUConfigDetail() {
                                     updateItem(index, "percent", e.target.value)
                                 }
                                 fullWidth
+                                disabled={loading}
                             />
                         </Grid>
                         <Grid item xs={2} display="flex" alignItems="center">
                             <Button
                                 color="error"
                                 onClick={() => removeItem(index)}
+                                disabled={loading}
                             >
                                 Hapus
                             </Button>
@@ -149,7 +185,7 @@ export default function SHUConfigDetail() {
                     </Grid>
                 ))}
 
-                <Button onClick={addItem} sx={{ mt: 2 }}>
+                <Button onClick={addItem} sx={{ mt: 2 }} disabled={loading}>
                     + Tambah Pembagian
                 </Button>
 
@@ -163,7 +199,7 @@ export default function SHUConfigDetail() {
                 <Grid container justifyContent="flex-end" mt={3}>
                     <Button
                         variant="contained"
-                        disabled={!isValidTotal}
+                        disabled={!isValidTotal || loading}
                         onClick={handleSubmit}
                     >
                         Simpan Perubahan

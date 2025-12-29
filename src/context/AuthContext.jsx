@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
     const [refreshToken, setRefreshToken] = useState(localStorage.getItem("refreshToken"))
 
     const login = (userData, tokenData, refreshTokenData) => {
-        console.log(userData);
         setUser(userData);
         setToken(tokenData);
         setRefreshToken(refreshTokenData)
@@ -28,7 +27,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
     };
-
 
     return (
         <AuthContext.Provider value={{ user, token, refreshToken, login, logout }}>

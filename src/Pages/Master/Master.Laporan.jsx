@@ -69,7 +69,6 @@ export default function LaporanMaster() {
                 Laporan Tahunan
             </Typography>
 
-            {/* Tahun + Navigasi SHU Config */}
             <Paper elevation={3} sx={{ borderRadius: 3, p: 3, mt: 2 }}>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} md={8}>

@@ -13,6 +13,12 @@ export default function HomePage() {
     const { dashboard, loading } = useDashboardData({ login, logout });
 
     const isXsScreen = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
+    const { user } = useAuth();
+
+    const allow = (roles) => user && roles.includes(user.role);
+
+    if (!user) return null;
     return (
         <>
             <Typography variant="h4" fontWeight={500} fontFamily={'montserrat'} color="initial">Beranda</Typography>
@@ -31,7 +37,7 @@ export default function HomePage() {
                 </Grid>
             </Paper>
             <Grid container spacing={3} py={3} alignItems="center">
-                <Grid item xs="12" md="4">
+                <Grid item xs="12" md="12" lg="4">
                     <Paper elevation={3} sx={{ borderRadius: 5, p: 2, background: 'linear-gradient(to bottom left, #91C125, #3285A9)' }}>
                         <Grid container spacing={1} alignItems="center">
                             <Grid item xs={6}>
@@ -52,7 +58,7 @@ export default function HomePage() {
                         </Grid>
                     </Paper>
                 </Grid>
-                <Grid item xs="12" md="4">
+                <Grid item xs="12" md="12" lg="4">
                     <Paper elevation={3} sx={{ borderRadius: 5, p: 2 }}>
                         <Grid container spacing={1} alignItems="center">
                             <Grid item xs={6}>
@@ -78,7 +84,7 @@ export default function HomePage() {
                         </Grid>
                     </Paper>
                 </Grid>
-                <Grid item xs="12" md="4">
+                <Grid item xs="12" md="12" lg="4">
                     <Paper elevation={3} sx={{ borderRadius: 5, p: 2 }}>
                         <Grid container spacing={1} alignItems="center">
                             <Grid item xs={6}>

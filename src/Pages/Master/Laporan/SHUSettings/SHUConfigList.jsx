@@ -14,26 +14,49 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../../api/api";
 import { handleApiError } from "../../../../utils/handleApiError";
 import { useAuth } from "../../../../context/AuthContext";
+import { useError } from "../../../../context/ErrorContext";
 
 export default function SHUConfigList() {
     const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
     const { logout, login } = useAuth();
-
-    const fetchData = async () => {
-        try {
-            const res = await api.get("/shuConfig", {
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            });
-            setData(res.data.data || []);
-        } catch (err) {
-            handleApiError(err, null, { logout, login });
-        }
-    };
+    const { showError } = useError();
 
     useEffect(() => {
+        let isMounted = true;
+
+        const fetchData = async () => {
+            setLoading(true);
+
+            try {
+                const res = await api.get("/shuConfig", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+
+                if (!isMounted) return;
+
+                setData(res.data?.data || []);
+            } catch (err) {
+                const result = await handleApiError(err, { login, logout });
+
+                if (result && !result.silent) {
+                    showError(result.message, result.title);
+                }
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
         fetchData();
-    }, []);
+
+        return () => {
+            isMounted = false;
+        };
+    }, [login, logout, showError]);
 
     return (
         <>
@@ -46,6 +69,7 @@ export default function SHUConfigList() {
                     <Button
                         variant="contained"
                         onClick={() => navigate("/master/shu-config/create")}
+                        disabled={loading}
                     >
                         Tambah Tahun SHU
                     </Button>
@@ -70,7 +94,9 @@ export default function SHUConfigList() {
                                         size="small"
                                         variant="outlined"
                                         onClick={() =>
-                                            navigate(`/master/shu-config/${row.tahun}`)
+                                            navigate(
+                                                `/master/shu-config/${row.tahun}`
+                                            )
                                         }
                                     >
                                         Detail
@@ -78,6 +104,14 @@ export default function SHUConfigList() {
                                 </TableCell>
                             </TableRow>
                         ))}
+
+                        {!loading && data.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={3} align="center">
+                                    Tidak ada data
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </Paper>
