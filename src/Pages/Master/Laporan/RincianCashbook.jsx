@@ -1,15 +1,18 @@
 import { Grid } from "@mui/material";
-import { useParams } from "react-router-dom";
 import DataTable from "../../TableView";
+import { useSearchParams } from "react-router-dom";
 
 export default function CashBookWithFilter() {
-    const { module } = useParams(); // INCOME | EXPENSE | MODAL | etc
+    const [searchParams] = useSearchParams();
+
+    const modul = searchParams.get("modul");
+    const tahun = searchParams.get("tahun");
 
     const getTitle = () => {
-        switch (module) {
+        switch (modul) {
             case 'INCOME': return 'PENDAPATAN';
             case 'EXPENSE': return 'PENGELUARAN';
-            default: module
+            default: modul
         }
     }
     return (
@@ -17,7 +20,7 @@ export default function CashBookWithFilter() {
             <Grid item md={12} xs={12}>
                 <DataTable
                     title={getTitle()}
-                    endpoint={`/cashbook/search?module=${module}`}
+                    endpoint={`/cashbook/search?module=${modul}&year=${tahun}`}
                     columns={[
                         { key: "date", label: "Tanggal" },
                         { key: "member.name", label: "Anggota" },

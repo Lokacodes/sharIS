@@ -11,13 +11,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../../api/api";
 import { handleApiError } from "../../../../utils/handleApiError";
 import { useAuth } from "../../../../context/AuthContext";
-import { useError } from "../../../../context/ErrorContext";
 
 export default function SHUConfigDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { logout, login } = useAuth();
-    const { showError } = useError();
 
     const [tahun, setTahun] = useState("");
     const [config, setConfig] = useState(null);
@@ -52,11 +50,7 @@ export default function SHUConfigDetail() {
                 );
                 setConfig(data);
             } catch (err) {
-                const result = await handleApiError(err, { login, logout });
-
-                if (result && !result.silent) {
-                    showError(result.message, result.title);
-                }
+                handleApiError(err, navigate, { login, logout });
             } finally {
                 if (isMounted) setLoading(false);
             }
@@ -67,7 +61,7 @@ export default function SHUConfigDetail() {
         return () => {
             isMounted = false;
         };
-    }, [id, login, logout, showError]);
+    }, [id, login, logout]);
 
     const totalPercent = useMemo(
         () =>
@@ -119,11 +113,7 @@ export default function SHUConfigDetail() {
             // ✅ success flow
             navigate("/master/shu-config");
         } catch (err) {
-            const result = await handleApiError(err, { login, logout });
-
-            if (result && !result.silent) {
-                showError(result.message, result.title);
-            }
+            handleApiError(err, navigate, { login, logout });
         } finally {
             setLoading(false);
         }

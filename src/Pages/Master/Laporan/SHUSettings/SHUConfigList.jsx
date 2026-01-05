@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../../api/api";
 import { handleApiError } from "../../../../utils/handleApiError";
 import { useAuth } from "../../../../context/AuthContext";
-import { useError } from "../../../../context/ErrorContext";
 
 export default function SHUConfigList() {
     const [data, setData] = useState([]);
@@ -22,7 +21,6 @@ export default function SHUConfigList() {
 
     const navigate = useNavigate();
     const { logout, login } = useAuth();
-    const { showError } = useError();
 
     useEffect(() => {
         let isMounted = true;
@@ -41,11 +39,7 @@ export default function SHUConfigList() {
 
                 setData(res.data?.data || []);
             } catch (err) {
-                const result = await handleApiError(err, { login, logout });
-
-                if (result && !result.silent) {
-                    showError(result.message, result.title);
-                }
+                handleApiError(err, navigate, { login, logout });
             } finally {
                 if (isMounted) setLoading(false);
             }
@@ -56,7 +50,7 @@ export default function SHUConfigList() {
         return () => {
             isMounted = false;
         };
-    }, [login, logout, showError]);
+    }, [login, logout]);
 
     return (
         <>

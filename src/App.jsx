@@ -10,7 +10,6 @@ import SHUConfigList from './Pages/Master/Laporan/SHUSettings/SHUConfigList'
 import SHUConfigDetail from './Pages/Master/Laporan/SHUSettings/SHUConfigDetail'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import DataTable from './Pages/TableView'
 import PinjamanForm from './Pages/Transaksi/PinjamanForm'
 import MemberDetail from './Pages/Detail/MemberDetails'
 import AngsuranForm from './Pages/Transaksi/AngsuranForm'
@@ -88,7 +87,7 @@ function App() {
               <Route path="master/shu-config/:id" element={<SHUConfigDetail />} />
               <Route path="master/shu-config/create" element={<SHUConfigCreate />} />
               <Route path="master/pengeluaran" element={<Expense />} />
-              <Route path="master/laporan/rincian/:module" element={<CashBookWithFilter />} />
+              <Route path="master/laporan/rincian" element={<CashBookWithFilter />} />
             </Route>
           </Routes>
         </AuthProvider>

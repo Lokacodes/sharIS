@@ -38,6 +38,37 @@ export default function LaporanMaster() {
         }
     };
 
+    const handleExport = async () => {
+        const baseUrl = import.meta.env.VITE_API_URL
+        try {
+            const token = localStorage.getItem("token")
+
+            const res = await fetch(
+                `${baseUrl}/export?tahun=${tahun}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+
+            if (!res.ok) throw new Error("Unauthorized")
+
+            const blob = await res.blob()
+            const url = window.URL.createObjectURL(blob)
+
+            const a = document.createElement("a")
+            a.href = url
+            a.download = `laporan-${tahun}.xlsx`
+            a.click()
+
+            URL.revokeObjectURL(url)
+        } catch (e) {
+            alert("Gagal mengunduh laporan")
+        }
+    }
+
+
     // Fetch SHU config list (once)
     useEffect(() => {
         fetchData2();
@@ -103,6 +134,16 @@ export default function LaporanMaster() {
             {shu && <SHULaporan data={shu} />}
             {shu && <LabaRugiSection data={shu} />}
             {neraca && <NeracaLaporan data={neraca} />}
+            {shu && neraca && tahun &&
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        handleExport()
+                    }}
+                    sx={{ mt: 2 }}
+                >
+                    Download Laporan
+                </Button>}
         </>
     );
 }

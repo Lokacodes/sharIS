@@ -34,7 +34,7 @@ export default function LabaRugiSection({ data }) {
                 <Grid item xs={6}>
                 </Grid>
                 <Grid item xs={6} textAlign="right">
-                    <button onClick={() => navigate("/master/laporan/rincian/INCOME")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#1976d2", textDecoration: "underline" }}>
+                    <button onClick={() => navigate(`/master/laporan/rincian?modul=INCOME&tahun=${data.tahun}`)} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#1976d2", textDecoration: "underline" }}>
                         (Rincian Pendapatan)
                     </button>
                 </Grid>
@@ -50,7 +50,7 @@ export default function LabaRugiSection({ data }) {
                 <Grid item xs={6}>
                 </Grid>
                 <Grid item xs={6} textAlign="right">
-                    <button onClick={() => navigate("/master/laporan/rincian/EXPENSE")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#1976d2", textDecoration: "underline" }}>
+                    <button onClick={() => navigate(`/master/laporan/rincian?modul=EXPENSE&tahun=${data.tahun}`)} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#1976d2", textDecoration: "underline" }}>
                         (Rincian Biaya)
                     </button>
                 </Grid>

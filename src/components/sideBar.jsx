@@ -234,7 +234,7 @@ export default function MiniDrawer({ children }) {
                         <ListItemText
                           primary={
                             <Typography fontSize={14}>
-                              Pengajuan Pinjaman
+                              Ajuan Pinjaman
                             </Typography>
                           }
                         />
